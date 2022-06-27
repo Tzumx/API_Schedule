@@ -123,7 +123,7 @@ def api_admin_add_staff(request, form_model, staff, initial={}):
                  'message': message, 'staff': staff}) 
 
 @api_view(['GET', 'POST'])
-@admin_required
+@serviceman_required
 def api_admin_worker(request):
     # Add workers
 
@@ -131,7 +131,7 @@ def api_admin_worker(request):
     return answer
 
 @api_view(['GET', 'POST'])
-@admin_required
+@serviceman_required
 def api_admin_location(request):
     # Add Location
     
@@ -139,7 +139,7 @@ def api_admin_location(request):
     return answer
 
 @api_view(['GET', 'POST'])
-@admin_required
+@serviceman_required
 def api_admin_schedule(request):
     # Add schedule
 

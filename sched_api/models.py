@@ -29,6 +29,8 @@ WEEK = (
 class Users(AbstractUser):
     '''
     Users for authentication
+        is_admin = Can add appointments
+        is_serviceman = Can add new users, workers, locations, schedules
     '''
     is_admin = models.BooleanField(default=False)
     is_serviceman = models.BooleanField(default=False)
