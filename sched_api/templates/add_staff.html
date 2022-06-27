@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Add {{ staff }}{% endblock %}
+
+{% block content %}
+
+<style>
+
+    .helptext{
+      visibility: hidden;
+      display:none;
+    }
+    
+</style>
+
+{% load crispy_forms_tags %} 
+
+{{ message }}
+
+<h2>Add {{ staff }}</h2>
+<form method="post">
+    {% csrf_token %}
+    <table>
+        {{ form|crispy }}
+    </table>
+    <br><br>&nbsp;
+    <button type="submit">Submit</button>
+</form>
+
+{% endblock %}

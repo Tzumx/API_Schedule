@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ message }}{% endblock %}
+
+{% block content %}
+{% load render_table from django_tables2 %}
+<head>
+    <title>{{ message }}</title>
+</head>
+<h2>{{ message }}</h2>
+<div class="row">
+    <div class="col-md-4"> 
+        {% render_table data %}
+    <div>
+</div>
+
+{% endblock %}

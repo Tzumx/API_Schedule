@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Create staff{% endblock %}
+
+{% block content %}
+
+<form method="post" >
+    <h2>Add staff</h2>
+    {% csrf_token %}  
+    <table>
+        <td></td>
+       {{ form.as_table }}  
+        <tr>  
+           <td></td>  
+           <td><input type="submit" name="save" value="Register" /></td>  
+       </tr>  
+    </table>  
+</form>
+{% endblock %}

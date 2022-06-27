@@ -1,0 +1,121 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    
+    .navbar {
+      overflow: hidden;
+      background-color: #333;
+    }
+    
+    .navbar a {
+      float: left;
+      font-size: 16px;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+    }
+    
+    .dropdown {
+      float: left;
+      overflow: hidden;
+    }
+
+    .loginout {
+      float: right;
+      overflow: hidden;
+    }
+    
+    .dropdown .dropbtn {
+      font-size: 16px;  
+      border: none;
+      outline: none;
+      color: white;
+      padding: 14px 16px;
+      background-color: inherit;
+      font-family: inherit;
+      margin: 0;
+    }
+    
+    .navbar a:hover, .dropdown:hover .dropbtn {
+      background-color: red;
+    }
+    
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+    
+    .dropdown-content a {
+      float: none;
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      text-align: left;
+    }
+    
+    .dropdown-content a:hover {
+      background-color: #ddd;
+    }
+    
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    </style>  
+    <title>{% block title %}Appointments API {% endblock %}</title>
+</head>
+<style>
+    body { padding-top: 10px;
+            font-family: Poppins;
+         }
+</style>
+
+
+<!-- This is the start of the navigation bar at the top of the page-->
+<header>
+    <div class= "navbar">
+        &nbsp;
+        <a href="{% url 'home' %}">Home</a> --
+        <a href="{% url 'api_schedule' %}">Schedule</a> --
+        <div class="dropdown">
+            <button class="dropbtn"> Add_staff 
+                <i class="fa fa-caret-down"></i>
+            </button>
+            <div class="dropdown-content">
+                <a href="{% url 'api_admin_worker' %}">Add workers</a>
+                <a href="{% url 'api_admin_location' %}">Add places</a>
+                <a href="{% url 'api_admin_schedule' %}">Add schedule</a>
+                <a href="{% url 'api_admin_appointments' %}">Add appointments</a>
+            </div>
+        </div>
+        <a href="{% url 'api_workers' %}">View_Workers</a> --
+        <a href="{% url 'admin' %}">Service</a> --
+        <a href="{% url 'api_view_appointments' %}">Appointments</a>
+        <div class="loginout">
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}">Hi {{ user.username }}! Log Out</a>
+            {% else %}
+                <a href="{% url 'login' %}">Log In</a>
+            {% endif %}
+        </div>
+    </div>
+</header>
+<body>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html>
