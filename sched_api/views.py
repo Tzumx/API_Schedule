@@ -25,17 +25,20 @@ def api_view_workers(request, type_result='html'):
 
             Returns:
                    Form for rendering in templates or JSON with data    
-    '''  
-    message = "List of workers"
-    worker_speciality = request.data['speciality'] if len(request.data)>0 else ''
-    if worker_speciality != '': workers_list = Worker.objects.filter(speciality=worker_speciality)
-    else: workers_list = Worker.objects.filter()
+    '''
+    try:
+        message = "List of workers"
+        worker_speciality = request.data['speciality'] if len(request.data)>0 else ''
+        if worker_speciality != '': workers_list = Worker.objects.filter(speciality=worker_speciality)
+        else: workers_list = Worker.objects.filter()
 
-    serialized_workers_list = WorkerSerializer(workers_list, many=True)
+        serialized_workers_list = WorkerSerializer(workers_list, many=True)
 
-    if type_result == 'html':
-        return render(request, 'view_list.html', context={'data': workers_list, 'message': message})
-    else: return JsonResponse(serialized_workers_list.data, safe=False)
+        if type_result == 'html':
+            return render(request, 'view_list.html', context={'data': workers_list, 'message': message})
+        else: return JsonResponse(serialized_workers_list.data, safe=False)
+    except Exception as err:
+        return JsonResponse({'error':str(err)})
 
 
 @api_view(['GET', ])
@@ -49,23 +52,26 @@ def api_worker_schedule(request, type_result='html'):
 
             Returns:
                    Form for rendering in templates or JSON with data    
-    '''      
-    worker_speciality = request.data['speciality'] if len(request.data)>0 else ''
-    day_schedule = (request.data['day']).isoweekday() if len(request.data)>0 else 0
+    '''
+    try:
+        worker_speciality = request.data['speciality'] if len(request.data)>0 else ''
+        day_schedule = (request.data['day']).isoweekday() if len(request.data)>0 else 0
 
-    worker_speciality_list = Schedule.objects.filter(worker__speciality = worker_speciality) if (
-        not worker_speciality == '') else Schedule.objects.filter()
-    
-    worker_day_schedule = worker_speciality_list.filter(day = day_schedule) if (
-        not day_schedule == 0) else worker_speciality_list
+        worker_speciality_list = Schedule.objects.filter(worker__speciality = worker_speciality) if (
+            not worker_speciality == '') else Schedule.objects.filter()
+        
+        worker_day_schedule = worker_speciality_list.filter(day = day_schedule) if (
+            not day_schedule == 0) else worker_speciality_list
 
-    filter = ScheduleFilter(request.GET, queryset = worker_speciality_list)
-    data = ScheduleTable(data=filter.qs)
-    serialized_schedule_list = ScheduleSerializer(worker_day_schedule, many=True)
-    
-    if type_result == 'html':
-        return render(request, 'schedule.html', context={'filter': filter, 'data': data})
-    else: return JsonResponse(serialized_schedule_list.data, safe=False)
+        filter = ScheduleFilter(request.GET, queryset = worker_speciality_list)
+        data = ScheduleTable(data=filter.qs)
+        serialized_schedule_list = ScheduleSerializer(worker_day_schedule, many=True)
+        
+        if type_result == 'html':
+            return render(request, 'schedule.html', context={'filter': filter, 'data': data})
+        else: return JsonResponse(serialized_schedule_list.data, safe=False)
+    except Exception as err:
+        return JsonResponse({'error':str(err)})    
 
 def api_view_appointments(request, type_result='html'):
     '''
@@ -77,14 +83,17 @@ def api_view_appointments(request, type_result='html'):
 
             Returns:
                    Form for rendering in templates or JSON with data    
-    '''      
-    message = "List of appointments"
-    appointments_list = Appointments.objects.all()
-    serialized_appointments_list = AppointmentsSerializer(appointments_list, many=True)
+    '''
+    try:  
+        message = "List of appointments"
+        appointments_list = Appointments.objects.all()
+        serialized_appointments_list = AppointmentsSerializer(appointments_list, many=True)
 
-    if type_result == 'html':
-        return render(request, 'view_list.html', context={'data': appointments_list, 'message': message})
-    else: return JsonResponse(serialized_appointments_list.data, safe=False)
+        if type_result == 'html':
+            return render(request, 'view_list.html', context={'data': appointments_list, 'message': message})
+        else: return JsonResponse(serialized_appointments_list.data, safe=False)
+    except Exception as err:
+        return JsonResponse({'error':str(err)})    
 
 
 # @api_view(['GET', 'POST'])
@@ -107,22 +116,26 @@ def api_admin_add_staff(request, form_model, staff, initial={}):
 
             Returns:
                    Form for rendering in templates   
-    '''     
-    form = form_model(data = request.POST, initial = initial)
-    message = ''
+    '''
+    try:
+        form = form_model(data = request.POST, initial = initial)
+        message = ''
 
-    if request.method == 'POST':
-        if form.is_valid(): # check for valid data in table's fields before saving
-            form.save()
-            message = "Saved"
-            render(request, 'add_staff.html', context={'form': form_model(initial = initial),
-                 'message': message, 'staff': staff})
-        else:
-            message = 'Invalid fields'
-    return render(request, 'add_staff.html', {'form': form_model(initial = initial),
-                 'message': message, 'staff': staff}) 
+        if request.method == 'POST':
+            if form.is_valid(): # check for valid data in table's fields before saving
+                form.save()
+                message = "Saved"
+                render(request, 'add_staff.html', context={'form': form_model(initial = initial),
+                    'message': message, 'staff': staff})
+            else:
+                message = 'Invalid fields'
+        return render(request, 'add_staff.html', {'form': form_model(initial = initial),
+                    'message': message, 'staff': staff})
+    except Exception as err:
+        return JsonResponse({'error':str(err)})                    
 
 @api_view(['GET', 'POST'])
+@login_required(login_url='login')
 @serviceman_required
 def api_admin_worker(request):
     # Add workers
@@ -131,6 +144,7 @@ def api_admin_worker(request):
     return answer
 
 @api_view(['GET', 'POST'])
+@login_required(login_url='login')
 @serviceman_required
 def api_admin_location(request):
     # Add Location
@@ -139,6 +153,7 @@ def api_admin_location(request):
     return answer
 
 @api_view(['GET', 'POST'])
+@login_required(login_url='login')
 @serviceman_required
 def api_admin_schedule(request):
     # Add schedule
@@ -147,17 +162,21 @@ def api_admin_schedule(request):
     return answer
 
 @api_view(['GET', 'POST'])
+@login_required(login_url='login')
 @admin_required
 def api_admin_appointments(request):
     # Add appointments
     
-    id = Users.objects.filter(username = request.user.username)
-    if request.method == 'POST':
-        request.POST._mutable = True
-        if len(id) == 1: request.POST['creator'] = id[0] # for setting initial value in creator (!delete!)
-        request.POST._mutable = False
-    elif request.method == 'GET':
-        pass
+    try:
+        id = Users.objects.filter(username = request.user.username)
+        if request.method == 'POST':
+            request.POST._mutable = True
+            if len(id) == 1: request.POST['creator'] = id[0] # for setting initial value in creator (!delete!)
+            request.POST._mutable = False
+        elif request.method == 'GET':
+            pass
+    except Exception as err:
+        return JsonResponse({'error':str(err)})
     answer = api_admin_add_staff(request, AppointmentsForm, 'appointments', initial={'creator': id[0]})
     return answer
 
@@ -189,19 +208,22 @@ class LogInView(View):
         return render(request, self.template_name, context={'form': form, 'message': message})
         
     def post(self, request):
-        form = self.form_class(data = request.POST)
+        try:
+            form = self.form_class(data = request.POST)
 
-        if form.is_valid():
-            user = authenticate(
-                username=form.cleaned_data['username'],
-                password=form.cleaned_data['password'],
-            )
-            if user is not None:
-                login(request, user)
-                next_url  = request.GET.get('next', 'home').replace("/", "")
-                return redirect(next_url) # redirect if come from another page
-        message = 'Login failed!'
-        return render(request, self.template_name, context={'form': form, 'message': message})
+            if form.is_valid():
+                user = authenticate(
+                    username=form.cleaned_data['username'],
+                    password=form.cleaned_data['password'],
+                )
+                if user is not None:
+                    login(request, user)
+                    next_url  = request.GET.get('next', 'home').replace("/", "")
+                    return redirect(next_url) # redirect if come from another page
+            message = 'Login failed!'
+            return render(request, self.template_name, context={'form': form, 'message': message})
+        except Exception as err:
+            return JsonResponse({'error':str(err)})
 
 def log_out(request):
     # logout

@@ -16,7 +16,7 @@ urlpatterns = [
 
     # Add different information to specific tables
     path('api_admin_worker', api_admin_worker, name='api_admin_worker'),
-    path('api_admin_Location', api_admin_location, name='api_admin_location'),
+    path('api_admin_location', api_admin_location, name='api_admin_location'),
     path('api_admin_schedule', api_admin_schedule, name='api_admin_schedule'),
     path('api_admin_appointments', api_admin_appointments, name='api_admin_appointments'),
 ]
