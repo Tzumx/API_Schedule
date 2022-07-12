@@ -88,7 +88,7 @@
     <div class= "navbar">
         &nbsp;
         <a href="{% url 'home' %}">Home</a> --
-        <a href="{% url 'api_schedule' %}">Schedule</a> --
+        <a href="{% url 'html_schedule' %}">Schedule</a> --
         <div class="dropdown">
             <button class="dropbtn"> Add_staff 
                 <i class="fa fa-caret-down"></i>
@@ -100,9 +100,9 @@
                 <a href="{% url 'api_admin_appointments' %}">Add appointments</a>
             </div>
         </div>
-        <a href="{% url 'api_workers' %}">View_Workers</a> --
+        <a href="{% url 'html_workers' %}">View_Workers</a> --
         <a href="{% url 'admin' %}">Service</a> --
-        <a href="{% url 'api_view_appointments' %}">Appointments</a>
+        <a href="{% url 'html_view_appointments' %}">Appointments</a>
         <div class="loginout">
             {% if user.is_authenticated %}
                 <a href="{% url 'logout' %}">Hi {{ user.username }}! Log Out</a>

@@ -20,13 +20,17 @@ class WorkerSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ScheduleSerializer(serializers.ModelSerializer):
-    
+    worker = serializers.ReadOnlyField(source='worker.name')
+
     class Meta:
         model = Schedule
         fields = '__all__'
 
 class AppointmentsSerializer(serializers.ModelSerializer):
-    
+    worker = serializers.ReadOnlyField(source='worker.name')
+    place = serializers.ReadOnlyField(source='place.name')
+    creator = serializers.ReadOnlyField(source='creator.username')
+
     class Meta:
         model = Appointments
         fields = '__all__'

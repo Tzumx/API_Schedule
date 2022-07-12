@@ -1,9 +1,11 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from .models import Appointments, Worker, Users, Schedule
-from .serializers import AppointmentsSerializer, WorkerSerializer, ScheduleSerializer
+from rest_framework.response import Response
+from .models import Appointments, Worker, Users, Schedule, Users
+from .serializers import AppointmentsSerializer, WorkerSerializer, ScheduleSerializer, UsersSerializer
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.views.generic import CreateView, View
@@ -13,6 +15,27 @@ from django.contrib.auth import authenticate, logout
 from .decorators import serviceman_required, admin_required
 from django.utils.decorators import method_decorator
 from .filters import ScheduleFilter, ScheduleTable
+
+class WorkerList(generics.ListAPIView):
+    '''
+    Work with Worker model using API
+    '''
+    queryset = Worker.objects.all()
+    serializer_class = WorkerSerializer
+
+class ScheduleList(generics.ListAPIView):
+    '''
+    Work with Schedule model using API
+    '''    
+    queryset = Schedule.objects.all()
+    serializer_class = ScheduleSerializer
+
+class AppointmentList(generics.ListAPIView):
+    '''
+    Work with Appointments model using API
+    '''    
+    queryset = Appointments.objects.all()
+    serializer_class = AppointmentsSerializer    
 
 @api_view(['GET', ])
 def api_view_workers(request, type_result='html'):
@@ -229,3 +252,18 @@ def log_out(request):
     # logout
     logout(request)
     return redirect('home')
+
+@method_decorator([serviceman_required], name='dispatch')
+class UserList(generics.ListCreateAPIView):
+    '''
+    Work with Users model using API
+    '''
+    queryset = Users.objects.all()
+    serializer_class = UsersSerializer
+
+    def get(self, request, format=None):
+        queryset = Users.objects.all()
+        serializer = UsersSerializer(queryset, many=True)
+        data = [{'username': x['username'], 'is_admin': x['is_admin'], 
+                'is_serviceman': x['is_serviceman']} for x in serializer.data]
+        return Response(data)

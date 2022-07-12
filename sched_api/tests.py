@@ -5,6 +5,8 @@ from .models import Schedule, Worker, Location, Appointments, Users
 from .models import check_overlap
 from .forms import WorkerForm, LocationForm, ScheduleForm, AppointmentsForm
 from .views import api_admin_add_staff
+from .serializers import (UsersSerializer, WorkerSerializer, 
+                    LocationSerializer, ScheduleSerializer, AppointmentsSerializer)
 import datetime
 from django.contrib.auth import get_user_model
 
@@ -110,7 +112,7 @@ class ViewTest(TestCase):
         # Worker
         worker_test = ModelTest.worker
         worker_test.save()
-        url = reverse("api_workers")
+        url = reverse("html_workers")
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
@@ -123,7 +125,7 @@ class ViewTest(TestCase):
         # Schedule
         schedule_test = ModelTest.schedule
         schedule_test.save()
-        url = reverse("api_schedule")
+        url = reverse("html_schedule")
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
@@ -136,7 +138,7 @@ class ViewTest(TestCase):
         # Appointments
         appointments_test = ModelTest.appointments
         appointments_test.save()
-        url = reverse("api_view_appointments")
+        url = reverse("html_view_appointments")
         resp = self.client.get(url)
 
         self.assertEqual(resp.status_code, 200)
@@ -235,4 +237,38 @@ class ViewTest(TestCase):
                 'day':datetime.date(2022,6,24), 'time_in':"11:22", 'time_out':"11:30", 
                 'title':'test_app_2', 'creator': '1'}
         response = self.client.post(reverse('api_admin_appointments'), data)
-        self.assertEqual(Appointments.objects.filter()[0].time_in, datetime.time(11,22))          
+        self.assertEqual(Appointments.objects.filter()[0].time_in, datetime.time(11,22))
+
+class SerializersTest(TestCase):
+    '''
+    Serializers tests
+    '''
+
+    def test_serializer(self):
+        user = UsersSerializer()
+        user.create({'username':'testuser', 'password':'testpass'})
+        self.assertEqual(UsersSerializer(Users.objects.filter(username='testuser'),
+                         many=True).data[0]['password'],'testpass') # check correct
+        self.assertEqual(len(Users.objects.filter(username='wronguser')),0) # check mistake
+
+        location = LocationSerializer()
+        location.create({'name':'testname', 'room':1})
+        self.assertEqual(LocationSerializer(Location.objects.filter(name='testname'),
+                         many=True).data[0]['room'],1) # check correct
+        self.assertEqual(len(Location.objects.filter(room=2)),0) # check mistake
+
+        worker = WorkerSerializer()
+        worker.create({'name':'testname', 'speciality':'test_spec'})
+        self.assertEqual(WorkerSerializer(Worker.objects.filter(name='testname'),
+                         many=True).data[0]['speciality'],'test_spec') # check correct
+        self.assertNotEqual(WorkerSerializer(Worker.objects.filter(name='testname'),
+                         many=True).data[0]['speciality'],'wrong') # check wrong                         
+        self.assertEqual(len(Worker.objects.filter(name='wrong')),0) # check mistake
+
+        schedule = ScheduleSerializer()
+        schedule.create({'worker':Worker.objects.get(pk=1), 'day':1, 'time_in':'11:00', 'time_out':'22:00'})
+        self.assertEqual(ScheduleSerializer(Schedule.objects.filter(time_in='11:00'),
+                         many=True).data[0]['time_out'],'22:00:00') # check correct
+        self.assertNotEqual(ScheduleSerializer(Schedule.objects.filter(time_in='11:00'),
+                         many=True).data[0]['time_out'],'11:00') # check wrong
+        self.assertEqual(len(Schedule.objects.filter(day=2)),0) # check mistake
